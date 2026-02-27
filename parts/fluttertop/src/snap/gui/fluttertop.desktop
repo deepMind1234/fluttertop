@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=FlutterTop
-Comment=A modern Linux system monitor
-Exec=fluttertop
-Icon=${SNAP}/meta/gui/fluttertop.png
-Terminal=false
-Type=Application
-Categories=Utility;System;Monitor;
-StartupNotify=true

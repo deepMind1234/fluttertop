@@ -1,17 +1,17 @@
 name: fluttertop
 title: FlutterTop
 version: "0.1.0"
-summary: A beautifully animated modern Linux system monitor
+summary: A simple system monitor made with flutter for aesthetic visualization of system processes.
 description: |
   FlutterTop is a powerful, visually stunning system monitoring dashboard for Linux.
   It tracks CPU, Memory, Disk, Network, and GPU usage in real-time with an emphasis on clarity and performance.
 
 license: MIT
-website: https://github.com/example/fluttertop
-contact: mailto:someone@example.com
-donation: https://github.com/example/fluttertop#donations
-issues: https://github.com/example/fluttertop/issues
-source-code: https://github.com/example/fluttertop
+website: https://github.com/deepMind1234/fluttertop
+contact: soulfulsapien@gmail.com
+donation: https://github.com/deepMind1234/fluttertop#donations
+issues: https://github.com/deepMind1234/fluttertop/issues
+source-code: https://github.com/deepMind1234/fluttertop
 
 confinement: strict
 base: core24
