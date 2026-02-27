@@ -1,0 +1,33 @@
+name: fluttertop
+version: "0.1.0"
+summary: A beautifully animated modern Linux system monitor
+description: |
+  FlutterTop is a powerful, visually stunning system monitoring dashboard for Linux.
+  It tracks CPU, Memory, Disk, Network, and GPU usage in real-time with an emphasis on clarity and performance.
+
+confinement: strict
+base: core24
+grade: stable
+
+# This tells Snapcraft where the desktop file and icon are.
+# By convention, snap/gui/fluttertop.desktop and snap/gui/fluttertop.png are automatically copied.
+
+apps:
+  fluttertop:
+    command: fluttertop
+    extensions: [gnome]
+    common-id: com.example.fluttertop
+    plugs:
+      - network
+      - system-observe
+      - hardware-observe
+      - mount-observe
+      - opengl
+      - wayland
+      - x11
+
+parts:
+  fluttertop:
+    source: .
+    plugin: flutter
+    flutter-target: lib/main.dart

@@ -1,0 +1,39 @@
+Resolving dependencies...
+Downloading packages...
+  matcher 0.12.18 (0.12.19 available)
+  meta 1.17.0 (1.18.1 available)
+  shared_preferences_android 2.4.20 (2.4.21 available)
+  test_api 0.7.9 (0.7.10 available)
+Got dependencies!
+4 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Analyzing fluttertop...                                         
+
+   info • Don't invoke 'print' in production code • lib/data/sources/cpu_source.dart:151:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/data/sources/disk_source.dart:134:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/data/sources/gpu_source.dart:94:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/data/sources/identity_source.dart:110:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/data/sources/memory_source.dart:94:7 • avoid_print
+   info • The local variable '_whitespaceRegex' starts with an underscore • lib/data/sources/process_source.dart:45:9 • no_leading_underscores_for_local_identifiers
+   info • Statements in an if should be enclosed in a block • lib/data/sources/process_source.dart:153:21 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/data/sources/process_source.dart:157:21 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/data/sources/process_source.dart:161:21 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/data/sources/process_source.dart:182:25 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/data/sources/process_source.dart:186:25 • curly_braces_in_flow_control_structures
+   info • Statements in a for should be enclosed in a block • lib/data/sources/process_source.dart:260:34 • curly_braces_in_flow_control_structures
+   info • Don't invoke 'print' in production code • lib/data/sources/thermal_source.dart:42:7 • avoid_print
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/presentation/dashboard/dashboard_view.dart:117:50 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/presentation/dashboard/dashboard_view.dart:274:68 • deprecated_member_use
+   info • Statements in an if should be enclosed in a block • lib/presentation/dashboard/process_detail_view.dart:34:13 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/presentation/dashboard/process_detail_view.dart:60:15 • curly_braces_in_flow_control_structures
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/presentation/dashboard/process_detail_view.dart:279:57 • deprecated_member_use
+   info • Statements in an if should be enclosed in a block • lib/presentation/dashboard/process_detail_view.dart:330:5 • curly_braces_in_flow_control_structures
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/presentation/widgets/metric_cards/base_metric_card.dart:24:33 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/presentation/widgets/metric_cards/storage_pie_chart.dart:48:35 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/presentation/widgets/metric_cards/storage_pie_chart.dart:72:42 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/presentation/widgets/time_series_chart.dart:35:33 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/presentation/widgets/time_series_chart.dart:64:44 • deprecated_member_use
+   info • Statements in an if should be enclosed in a block • lib/presentation/widgets/time_series_chart.dart:88:33 • curly_braces_in_flow_control_structures
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/presentation/widgets/time_series_chart.dart:117:42 • deprecated_member_use
+
+26 issues found. (ran in 3.9s)
