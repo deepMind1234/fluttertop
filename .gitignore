@@ -43,3 +43,10 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Snapcraft related
+/parts/
+/stage/
+/prime/
+*.snap
+*.snap-build*
