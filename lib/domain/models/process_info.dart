@@ -17,6 +17,8 @@ class ProcessInfo {
   final int vmHwmKb;
   final int readBytes;
   final int writeBytes;
+  final String commandLine;
+  final String executablePath;
 
   ProcessInfo({
     required this.pid,
@@ -37,5 +39,7 @@ class ProcessInfo {
     required this.vmHwmKb,
     required this.readBytes,
     required this.writeBytes,
+    required this.commandLine,
+    required this.executablePath,
   });
 }

@@ -7,6 +7,24 @@
 
 ![FlutterTop Logo](snap/gui/fluttertop.png)
 
+## 📖 Motivation & Background
+
+The motivation behind FlutterTop stems from my experiences throughout the Canonical interview process and the time I spent diving deep into the Snap ecosystem and Linux application development.
+
+Previously, I found myself using many different terminal and GUI resource monitors simultaneously. This often felt like it caused shared resource contention, and the fragmented experience left much to be desired. I wanted to create a more **unified interface** using a highly aesthetic, premium GUI that brings all essential system metrics into one beautiful dashboard.
+
+*Note: AI was used as a part of this project, primarily to help format code and to bring to life some of the complex UI and glassmorphic aspects of the application.*
+
+## 🏗️ Architecture
+
+The project is structured around a strict Clean Architecture approach, utilizing **three main layers** to separate UI rendering from low-level Linux system parsing:
+
+![Architecture Mermaid Graph](mermaid_graph.png)
+
+1. **Presentation Layer**: Handles the aesthetic UI, animations, and reactive state visualizations.
+2. **Domain Layer**: Contains the core business logic, entity models, and the services orchestrating the data streams.
+3. **Data Layer**: Manages the highly-optimized, asynchronous parsing of `/proc` and `/sys` file systems.
+
 ## ✨ Features
 
 - **CPU Monitoring**: Detailed per-core heatmaps and overall usage history.
@@ -35,17 +53,20 @@ sudo snap install fluttertop_*.snap --dangerous
 Ensure you have [Flutter installed](https://docs.flutter.dev/get-started/install/linux).
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/deepMind1234/fluttertop.git
    cd fluttertop
    ```
 
 2. Get dependencies:
+
    ```bash
    flutter pub get
    ```
 
 3. Run the application:
+
    ```bash
    flutter run -d linux
    ```
@@ -53,13 +74,17 @@ Ensure you have [Flutter installed](https://docs.flutter.dev/get-started/install
 ## 🛠 Development
 
 ### Snapcraft Build
+
 To package the application as a snap locally:
+
 ```bash
 snapcraft pack
 ```
 
 ### Static Analysis
+
 Keep the codebase clean by running:
+
 ```bash
 flutter analyze
 ```

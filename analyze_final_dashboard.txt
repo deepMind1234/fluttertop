@@ -1,0 +1,10 @@
+Analyzing fluttertop...                                         
+
+warning • Unused import: 'dart:io' • lib/presentation/dashboard/dashboard_view.dart:2:8 • unused_import
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/presentation/dashboard/dashboard_view.dart:130:50 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/presentation/dashboard/dashboard_view.dart:334:49 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/presentation/dashboard/process_detail_view.dart:321:57 • deprecated_member_use
+   info • The import of 'package:flutter/foundation.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/presentation/theme/theme_manager.dart:2:8 • unnecessary_import
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/presentation/widgets/process_list_widget.dart:70:46 • deprecated_member_use
+
+6 issues found. (ran in 2.4s)

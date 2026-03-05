@@ -1,10 +1,21 @@
 name: fluttertop
 title: FlutterTop
-version: "0.1.0"
-summary: A simple system monitor made with flutter for aesthetic visualization of system processes.
+version: "0.1.1"
+icon: snap/gui/fluttertop.png
+summary: A simple system monitor made with flutter
 description: |
-  FlutterTop is a powerful, visually stunning system monitoring dashboard for Linux.
-  It tracks CPU, Memory, Disk, Network, and GPU usage in real-time with an emphasis on clarity and performance.
+  FlutterTop is a powerful, visually stunning system monitoring dashboard for Linux. 
+  It is meant to be a beautiful visualization of the results provided by the kernel and is meant to be a more approachable way to get informed of the system internals as they run.
+
+  It tracks CPU, Memory, Disk, Network, and GPU usage in real-time with an emphasis on clarity and performance. I will continue updating the project with more detail.
+
+  Note: This application requires access to system data stores to function correctly. Please enable permissions in the Snap Store GUI, or by running the following commands in your terminal:
+
+  sudo snap connect fluttertop:system-observe
+  sudo snap connect fluttertop:hardware-observe
+  sudo snap connect fluttertop:mount-observe
+  sudo snap connect fluttertop:network-observe
+  sudo snap connect fluttertop:upower-observe
 
 license: MIT
 website: https://github.com/deepMind1234/fluttertop
@@ -30,9 +41,9 @@ apps:
       - system-observe
       - hardware-observe
       - mount-observe
-      - opengl
-      - wayland
-      - x11
+      - upower-observe
+      - removable-media
+      - network-observe
 
 parts:
   fluttertop:

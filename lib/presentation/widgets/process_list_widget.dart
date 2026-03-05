@@ -67,7 +67,7 @@ class _ProcessListWidgetState extends State<ProcessListWidget> {
         ),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          color: Theme.of(context).cardColor.withValues(alpha: 0.5),
+          color: Theme.of(context).cardColor.withOpacity(0.5),
           child: Row(
             children: [
               Expanded(
@@ -97,7 +97,10 @@ class _ProcessListWidgetState extends State<ProcessListWidget> {
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (ctx) => ProcessDetailView(pid: proc.pid),
+                      builder: (ctx) => ProcessDetailView(
+                        pid: proc.pid,
+                        initialName: proc.name,
+                      ),
                     ),
                   );
                 },

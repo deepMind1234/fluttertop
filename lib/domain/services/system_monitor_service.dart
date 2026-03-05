@@ -3,6 +3,7 @@ import 'dart:isolate';
 
 import '../models/system_state.dart';
 import '../models/system_identity.dart';
+import '../models/process_info.dart';
 import '../../data/sources/cpu_source.dart';
 import '../../data/sources/memory_source.dart';
 import '../../data/sources/identity_source.dart';
@@ -20,6 +21,7 @@ class SystemMonitorService {
       StreamController<SystemState>.broadcast();
 
   SystemIdentity? _cachedIdentity;
+  final ProcessDataSource _processSource = ProcessDataSource();
 
   Stream<SystemState> get systemStateStream => _stateController.stream;
 
@@ -43,6 +45,10 @@ class SystemMonitorService {
         _stateController.add(message);
       }
     });
+  }
+
+  Future<ProcessInfo?> getProcessDetail(int pid) async {
+    return _processSource.getProcessDetail(pid);
   }
 
   void stop() {

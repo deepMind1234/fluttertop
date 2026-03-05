@@ -39,7 +39,162 @@ class _ProcessComputeResult {
   });
 }
 
-Future<_ProcessComputeResult> _parseProcessesInIsolate(
+Future<ProcessInfo?> _parseSingleProcessInIsolate(
+  _ProcessComputeArgs args,
+  int targetPid,
+) async {
+  final whitespaceRegex = RegExp(r'\s+');
+  final deltaTotal = args.currentTotalCpuTime - args.prevTotalCpuTime;
+
+  try {
+    final statFile = File('${args.procDir}/$targetPid/stat');
+    final statusFile = File('${args.procDir}/$targetPid/status');
+
+    if (statFile.existsSync() && statusFile.existsSync()) {
+      final statContent = statFile.readAsStringSync();
+      final nameStart = statContent.indexOf('(');
+      final nameEnd = statContent.lastIndexOf(')');
+
+      if (nameStart != -1 && nameEnd != -1) {
+        final name = statContent.substring(nameStart + 1, nameEnd);
+        final statParts = statContent.substring(nameEnd + 2).split(' ');
+        final state = statParts[0];
+
+        final utime = int.tryParse(statParts[11]) ?? 0;
+        final stime = int.tryParse(statParts[12]) ?? 0;
+        final minflt = statParts.length > 7
+            ? (int.tryParse(statParts[7]) ?? 0)
+            : 0;
+        final majflt = statParts.length > 9
+            ? (int.tryParse(statParts[9]) ?? 0)
+            : 0;
+        final starttime = statParts.length > 19
+            ? (int.tryParse(statParts[19]) ?? 0)
+            : 0;
+        final coreId = statParts.length > 36
+            ? (int.tryParse(statParts[36]) ?? -1)
+            : -1;
+
+        final totalTime = utime + stime;
+        final double processUptimeSec = args.sysUptime - (starttime / 100.0);
+        final procUptime = Duration(
+          milliseconds: (processUptimeSec * 1000).toInt(),
+        );
+
+        final statusLines = statusFile.readAsLinesSync();
+        int vmRssKb = 0;
+        String user = 'unknown';
+        int volCtxtInfo = 0;
+        int nonVolCtxtInfo = 0;
+        int threadsCount = 0;
+        int vmPeakKb = 0;
+        int vmSizeKb = 0;
+        int vmHwmKb = 0;
+        int readBytes = 0;
+        int writeBytes = 0;
+
+        for (var line in statusLines) {
+          if (line.startsWith('VmRSS:')) {
+            final parts = line.split(whitespaceRegex);
+            if (parts.length >= 2) vmRssKb = int.tryParse(parts[1]) ?? 0;
+          } else if (line.startsWith('Uid:')) {
+            final parts = line.split(whitespaceRegex);
+            if (parts.length >= 2) {
+              final uid = int.tryParse(parts[1]);
+              if (uid != null) {
+                user = args.uidToUserCache[uid] ?? uid.toString();
+              }
+            }
+          } else if (line.startsWith('voluntary_ctxt_switches:')) {
+            final parts = line.split(whitespaceRegex);
+            if (parts.length >= 2) volCtxtInfo = int.tryParse(parts[1]) ?? 0;
+          } else if (line.startsWith('nonvoluntary_ctxt_switches:')) {
+            final parts = line.split(whitespaceRegex);
+            if (parts.length >= 2) nonVolCtxtInfo = int.tryParse(parts[1]) ?? 0;
+          } else if (line.startsWith('Threads:')) {
+            final parts = line.split(whitespaceRegex);
+            if (parts.length >= 2) threadsCount = int.tryParse(parts[1]) ?? 0;
+          } else if (line.startsWith('VmPeak:')) {
+            final parts = line.split(whitespaceRegex);
+            if (parts.length >= 2) vmPeakKb = int.tryParse(parts[1]) ?? 0;
+          } else if (line.startsWith('VmSize:')) {
+            final parts = line.split(whitespaceRegex);
+            if (parts.length >= 2) vmSizeKb = int.tryParse(parts[1]) ?? 0;
+          } else if (line.startsWith('VmHWM:')) {
+            final parts = line.split(whitespaceRegex);
+            if (parts.length >= 2) vmHwmKb = int.tryParse(parts[1]) ?? 0;
+          }
+        }
+
+        String commandLine = '';
+        String executablePath = '';
+
+        try {
+          final cmdlineFile = File('${args.procDir}/$targetPid/cmdline');
+          if (cmdlineFile.existsSync()) {
+            final cmdContent = cmdlineFile.readAsStringSync();
+            // /proc/[pid]/cmdline is separated by null bytes
+            commandLine = cmdContent.replaceAll('\x00', ' ').trim();
+          }
+
+          final exeLink = Link('${args.procDir}/$targetPid/exe');
+          if (exeLink.existsSync()) {
+            executablePath = exeLink.targetSync();
+          }
+        } catch (_) {}
+
+        try {
+          final ioFile = File('${args.procDir}/$targetPid/io');
+          if (ioFile.existsSync()) {
+            final ioLines = ioFile.readAsLinesSync();
+            for (var line in ioLines) {
+              if (line.startsWith('read_bytes:')) {
+                final parts = line.split(whitespaceRegex);
+                if (parts.length >= 2) readBytes = int.tryParse(parts[1]) ?? 0;
+              } else if (line.startsWith('write_bytes:')) {
+                final parts = line.split(whitespaceRegex);
+                if (parts.length >= 2) writeBytes = int.tryParse(parts[1]) ?? 0;
+              }
+            }
+          }
+        } catch (_) {}
+
+        double cpuUsage = 0.0;
+        if (args.prevProcessStats.containsKey(targetPid) && deltaTotal > 0) {
+          final prevTime = args.prevProcessStats[targetPid]!;
+          final deltaProc = totalTime - prevTime;
+          cpuUsage = 100.0 * (deltaProc / deltaTotal) * args.cpuCoresCount;
+        }
+
+        return ProcessInfo(
+          pid: targetPid,
+          user: user,
+          name: name,
+          cpuUsagePercentage: cpuUsage,
+          memoryUsageBytes: vmRssKb * 1024,
+          state: state,
+          coreId: coreId,
+          uptime: procUptime,
+          minflt: minflt,
+          majflt: majflt,
+          voluntaryCtxtSwitches: volCtxtInfo,
+          nonvoluntaryCtxtSwitches: nonVolCtxtInfo,
+          threadsCount: threadsCount,
+          vmPeakKb: vmPeakKb,
+          vmSizeKb: vmSizeKb,
+          vmHwmKb: vmHwmKb,
+          readBytes: readBytes,
+          writeBytes: writeBytes,
+          commandLine: commandLine,
+          executablePath: executablePath,
+        );
+      }
+    }
+  } catch (_) {}
+  return null;
+}
+
+Future<_ProcessComputeResult> _parseProcessesMinimalInIsolate(
   _ProcessComputeArgs args,
 ) async {
   final whitespaceRegex = RegExp(r'\s+');
@@ -59,7 +214,7 @@ Future<_ProcessComputeResult> _parseProcessesInIsolate(
     );
   }
 
-  // Pre-load /etc/passwd if cache is empty to avoid reading it for every process
+  // Pre-load /etc/passwd if cache is empty
   if (localUidCache.isEmpty) {
     try {
       final passwdFile = File('/etc/passwd');
@@ -98,42 +253,13 @@ Future<_ProcessComputeResult> _parseProcessesInIsolate(
             if (nameStart != -1 && nameEnd != -1) {
               final name = statContent.substring(nameStart + 1, nameEnd);
               final statParts = statContent.substring(nameEnd + 2).split(' ');
-              final state = statParts[0];
-
               final utime = int.tryParse(statParts[11]) ?? 0;
               final stime = int.tryParse(statParts[12]) ?? 0;
-
-              final minflt = statParts.length > 7
-                  ? (int.tryParse(statParts[7]) ?? 0)
-                  : 0;
-              final majflt = statParts.length > 9
-                  ? (int.tryParse(statParts[9]) ?? 0)
-                  : 0;
-              final starttime = statParts.length > 19
-                  ? (int.tryParse(statParts[19]) ?? 0)
-                  : 0;
-              final coreId = statParts.length > 36
-                  ? (int.tryParse(statParts[36]) ?? -1)
-                  : -1;
-
               final totalTime = utime + stime;
-              final double processUptimeSec =
-                  args.sysUptime - (starttime / 100.0);
-              final procUptime = Duration(
-                milliseconds: (processUptimeSec * 1000).toInt(),
-              );
 
               final statusLines = statusFile.readAsLinesSync();
               int vmRssKb = 0;
               String user = 'unknown';
-              int volCtxtInfo = 0;
-              int nonVolCtxtInfo = 0;
-              int threadsCount = 0;
-              int vmPeakKb = 0;
-              int vmSizeKb = 0;
-              int vmHwmKb = 0;
-              int readBytes = 0;
-              int writeBytes = 0;
 
               for (var line in statusLines) {
                 if (line.startsWith('VmRSS:')) {
@@ -147,52 +273,9 @@ Future<_ProcessComputeResult> _parseProcessesInIsolate(
                       user = localUidCache[uid] ?? uid.toString();
                     }
                   }
-                } else if (line.startsWith('voluntary_ctxt_switches:')) {
-                  final parts = line.split(whitespaceRegex);
-                  if (parts.length >= 2) {
-                    volCtxtInfo = int.tryParse(parts[1]) ?? 0;
-                  }
-                } else if (line.startsWith('nonvoluntary_ctxt_switches:')) {
-                  final parts = line.split(whitespaceRegex);
-                  if (parts.length >= 2) {
-                    nonVolCtxtInfo = int.tryParse(parts[1]) ?? 0;
-                  }
-                } else if (line.startsWith('Threads:')) {
-                  final parts = line.split(whitespaceRegex);
-                  if (parts.length >= 2) {
-                    threadsCount = int.tryParse(parts[1]) ?? 0;
-                  }
-                } else if (line.startsWith('VmPeak:')) {
-                  final parts = line.split(whitespaceRegex);
-                  if (parts.length >= 2) vmPeakKb = int.tryParse(parts[1]) ?? 0;
-                } else if (line.startsWith('VmSize:')) {
-                  final parts = line.split(whitespaceRegex);
-                  if (parts.length >= 2) vmSizeKb = int.tryParse(parts[1]) ?? 0;
-                } else if (line.startsWith('VmHWM:')) {
-                  final parts = line.split(whitespaceRegex);
-                  if (parts.length >= 2) vmHwmKb = int.tryParse(parts[1]) ?? 0;
                 }
+                if (vmRssKb != 0 && user != 'unknown') break;
               }
-
-              try {
-                final ioFile = File('${args.procDir}/$pid/io');
-                if (ioFile.existsSync()) {
-                  final ioLines = ioFile.readAsLinesSync();
-                  for (var line in ioLines) {
-                    if (line.startsWith('read_bytes:')) {
-                      final parts = line.split(whitespaceRegex);
-                      if (parts.length >= 2) {
-                        readBytes = int.tryParse(parts[1]) ?? 0;
-                      }
-                    } else if (line.startsWith('write_bytes:')) {
-                      final parts = line.split(whitespaceRegex);
-                      if (parts.length >= 2) {
-                        writeBytes = int.tryParse(parts[1]) ?? 0;
-                      }
-                    }
-                  }
-                }
-              } catch (_) {}
 
               double cpuUsage = 0.0;
               if (args.prevProcessStats.containsKey(pid) && deltaTotal > 0) {
@@ -211,19 +294,21 @@ Future<_ProcessComputeResult> _parseProcessesInIsolate(
                   name: name,
                   cpuUsagePercentage: cpuUsage,
                   memoryUsageBytes: vmRssKb * 1024,
-                  state: state,
-                  coreId: coreId,
-                  uptime: procUptime,
-                  minflt: minflt,
-                  majflt: majflt,
-                  voluntaryCtxtSwitches: volCtxtInfo,
-                  nonvoluntaryCtxtSwitches: nonVolCtxtInfo,
-                  threadsCount: threadsCount,
-                  vmPeakKb: vmPeakKb,
-                  vmSizeKb: vmSizeKb,
-                  vmHwmKb: vmHwmKb,
-                  readBytes: readBytes,
-                  writeBytes: writeBytes,
+                  state: statParts[0],
+                  coreId: -1,
+                  uptime: Duration.zero,
+                  minflt: 0,
+                  majflt: 0,
+                  voluntaryCtxtSwitches: 0,
+                  nonvoluntaryCtxtSwitches: 0,
+                  threadsCount: 0,
+                  vmPeakKb: 0,
+                  vmSizeKb: 0,
+                  vmHwmKb: 0,
+                  readBytes: 0,
+                  writeBytes: 0,
+                  commandLine: '',
+                  executablePath: '',
                 ),
               );
             }
@@ -287,13 +372,32 @@ class ProcessDataSource {
       procDir: SystemPaths.procDir,
     );
 
-    // Offload the heavy synchronous parsing loops to a background isolate
-    final result = await compute(_parseProcessesInIsolate, args);
+    // Offload ONLY minimal parsing for the list
+    final result = await compute(_parseProcessesMinimalInIsolate, args);
 
     _uidToUserCache = result.updatedUidCache;
     _prevProcessStats = result.updatedProcessStats;
     _prevTotalCpuTime = result.newTotalCpuTime;
 
     return result.processes;
+  }
+
+  Future<ProcessInfo?> getProcessDetail(int pid) async {
+    final int currentTotalCpuTime = await _getTotalCpuTime();
+    final double sysUptime = await SystemUptimeSource().getUptimeSeconds();
+    final cpuCoresCount = Platform.numberOfProcessors;
+
+    final args = _ProcessComputeArgs(
+      uidToUserCache: _uidToUserCache,
+      prevTotalCpuTime: _prevTotalCpuTime,
+      currentTotalCpuTime: currentTotalCpuTime,
+      prevProcessStats: _prevProcessStats,
+      sysUptime: sysUptime,
+      cpuCoresCount: cpuCoresCount,
+      procDir: SystemPaths.procDir,
+    );
+
+    // Fetch deep stats ONLY for one pid
+    return await compute((a) => _parseSingleProcessInIsolate(a, pid), args);
   }
 }
