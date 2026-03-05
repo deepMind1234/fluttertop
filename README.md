@@ -3,42 +3,40 @@
 [![Platform](https://img.shields.io/badge/platform-linux-blue.svg)](https://flutter.dev)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**FlutterTop** is a visually stunning, modern Linux system monitoring dashboard built with Flutter. It provides real-time insights into your system's performance with beautiful animations and a clean, intuitive interface.
+**FlutterTop** is a modern Linux system monitoring dashboard built with Flutter. It provides real-time system insights through a clean and unified interface. It is based on the linux system monitor and other common resource monitors but tries to create an unified interface that is customizable with open code.
 
 ![FlutterTop Logo](snap/gui/fluttertop.png)
 
-## 📖 Motivation & Background
+## 📖 Motivation
 
-The motivation behind FlutterTop stems from my experiences throughout the Canonical interview process and the time I spent diving deep into the Snap ecosystem and Linux application development.
+I built FlutterTop after diving into the Snap ecosystem and Linux app development during the Canonical interview process. I wanted to create a project that would help solidify some of the practicial knowledge that I had gained as well as be project that I could reference as a body work. I initially spent my time looking through the helpful flutter and dart documentaion in the official website and then building small script using prexisting components before graduating to scripting and project design.
 
-Previously, I found myself using many different terminal and GUI resource monitors simultaneously. This often felt like it caused shared resource contention, and the fragmented experience left much to be desired. I wanted to create a more **unified interface** using a highly aesthetic, premium GUI that brings all essential system metrics into one beautiful dashboard.
-
-*Note: AI was used as a part of this project, primarily to help format code and to bring to life some of the complex UI and glassmorphic aspects of the application.*
+Why I choose to create **another** resource monitor. I was tired of using multiple terminal and GUI resource monitors at the same time. The fragmented experience left much to be desired, and running multiple monitors caused unnecessary resource contention. I wanted to create a single, unified dashboard that brings all essential system metrics together.
 
 ## 🏗️ Architecture
 
-The project is structured around a strict Clean Architecture approach, utilizing **three main layers** to separate UI rendering from low-level Linux system parsing:
+The project follows a Clean Architecture approach with three main layers to separate the UI from low-level Linux system parsing:
 
 ![Architecture Mermaid Graph](mermaid_graph.png)
 
-1. **Presentation Layer**: Handles the aesthetic UI, animations, and reactive state visualizations.
-2. **Domain Layer**: Contains the core business logic, entity models, and the services orchestrating the data streams.
-3. **Data Layer**: Manages the highly-optimized, asynchronous parsing of `/proc` and `/sys` file systems.
+1. **Presentation**: UI, animations, and state visualization.
+2. **Domain**: Core business logic, models, and data streams.
+3. **Data**: Async parsing of the `/proc` and `/sys` file systems.
 
 ## ✨ Features
 
-- **CPU Monitoring**: Detailed per-core heatmaps and overall usage history.
-- **Memory & Swap**: Visualized usage stats for physical RAM and swap space.
-- **Disk & Storage**: Real-time I/O tracking and storage capacity pie charts.
-- **GPU Stats**: Dedicated metrics for AMD and NVIDIA hardware.
-- **Network I/O**: Live upload and download speeds per interface.
-- **Process Management**: Deep profiling of individual processes, including hardware events (page faults) and software events (context switches).
+- **CPU**: Per-core heatmaps and usage history.
+- **Memory**: Usage stats for RAM and swap space.
+- **Disk**: Real-time I/O tracking and storage capacity.
+- **GPU**: Metrics for AMD and NVIDIA hardware.
+- **Network**: Live upload and download speeds.
+- **Processes**: Process profiling, including hardware and software events.
 
 ## 📦 Installation
 
 ### Install via Snap (Recommended)
 
-FlutterTop is packaged as a Snap for easy installation on most Linux distributions:
+FlutterTop is packaged as a Snap for easy installation:
 
 ```bash
 # Once published to the store:
